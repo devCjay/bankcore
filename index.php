@@ -9,6 +9,16 @@ if (file_exists(__DIR__ . '/storage/framework/maintenance.php')) {
     require __DIR__ . '/storage/framework/maintenance.php';
 }
 
+if (!file_exists(__DIR__ . '/.env')) {
+    foreach (['config.php', 'routes.php', 'events.php'] as $cacheFile) {
+        $cachePath = __DIR__ . '/bootstrap/cache/' . $cacheFile;
+
+        if (file_exists($cachePath)) {
+            @unlink($cachePath);
+        }
+    }
+}
+
 require __DIR__ . '/vendor/autoload.php';
 
 $app = require_once __DIR__ . '/bootstrap/app.php';
