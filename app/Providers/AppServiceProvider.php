@@ -33,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->ensureRuntimeDirectories();
+
         FacadesStorage::extend('sftp', function ($app, $config) {
             return new Filesystem(new SftpAdapter($config));
         });
@@ -60,5 +62,28 @@ class AppServiceProvider extends ServiceProvider
         View::share('terms', $terms);
         View::share('moresettings', $moreset);
         View::share('mod', $settings->modules);
+    }
+
+    private function ensureRuntimeDirectories(): void
+    {
+        $directories = [
+            storage_path('app'),
+            storage_path('app/public'),
+            storage_path('app/livewire-tmp'),
+            storage_path('framework'),
+            storage_path('framework/cache'),
+            storage_path('framework/cache/data'),
+            storage_path('framework/sessions'),
+            storage_path('framework/testing'),
+            storage_path('framework/views'),
+            storage_path('logs'),
+            base_path('bootstrap/cache'),
+        ];
+
+        foreach ($directories as $directory) {
+            if (!is_dir($directory)) {
+                @mkdir($directory, 0755, true);
+            }
+        }
     }
 }

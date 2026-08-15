@@ -200,17 +200,13 @@ class InstallController extends Controller
             ];
         }
 
-        $checks['storage'] = [
-            'label' => 'storage folder is writable',
-            'ok' => is_writable(storage_path()),
-            'value' => storage_path(),
-        ];
-
-        $checks['cache'] = [
-            'label' => 'bootstrap/cache folder is writable',
-            'ok' => is_writable(base_path('bootstrap/cache')),
-            'value' => base_path('bootstrap/cache'),
-        ];
+        foreach ($this->runtimeDirectories() as $key => $directory) {
+            $checks['dir_' . $key] = [
+                'label' => $directory['label'],
+                'ok' => is_dir($directory['path']) && is_writable($directory['path']),
+                'value' => $directory['path'],
+            ];
+        }
 
         $checks['env'] = [
             'label' => '.env can be written',
@@ -341,6 +337,20 @@ class InstallController extends Controller
         }
 
         return null;
+    }
+
+    private function runtimeDirectories(): array
+    {
+        return [
+            'storage' => ['label' => 'storage folder is writable', 'path' => storage_path()],
+            'app' => ['label' => 'storage/app folder is writable', 'path' => storage_path('app')],
+            'cache' => ['label' => 'storage/framework/cache folder is writable', 'path' => storage_path('framework/cache')],
+            'cache_data' => ['label' => 'storage/framework/cache/data folder is writable', 'path' => storage_path('framework/cache/data')],
+            'sessions' => ['label' => 'storage/framework/sessions folder is writable', 'path' => storage_path('framework/sessions')],
+            'views' => ['label' => 'storage/framework/views folder is writable', 'path' => storage_path('framework/views')],
+            'logs' => ['label' => 'storage/logs folder is writable', 'path' => storage_path('logs')],
+            'bootstrap_cache' => ['label' => 'bootstrap/cache folder is writable', 'path' => base_path('bootstrap/cache')],
+        ];
     }
 
     private function writeEnvironment(array $values): void
