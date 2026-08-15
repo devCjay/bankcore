@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\Settings\SubscriptionSettings;
 use App\Http\Controllers\Admin\IpaddressController;
 use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\Admin\ClearCacheController;
+use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\ManageAssetController;
 use App\Http\Controllers\Admin\MembershipController;
@@ -141,6 +142,9 @@ Route::middleware(['isadmin', '2fa'])->prefix('admin')->group(function () {
 
 	// clear cache
 	Route::get('dashboard/clearcache', [ClearCacheController::class, 'clearcache'])->name('clearcache');
+	Route::get('dashboard/license-manager', [LicenseController::class, 'index'])->name('admin.license.index');
+	Route::post('dashboard/license-manager', [LicenseController::class, 'update'])->name('admin.license.update');
+	Route::post('dashboard/license-manager/verify', [LicenseController::class, 'verify'])->name('admin.license.verify');
 	// updatertransfercodes
 	Route::put('dashboard/updatertransfercodes', [AppSettingsController::class, 'updatertransfercodes'])->name('updatertransfercodes');
 	// Update App Information

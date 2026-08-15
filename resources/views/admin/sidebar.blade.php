@@ -312,7 +312,7 @@
                     </li>
 
                     <li
-                        class="nav-item {{ request()->routeIs('appsettingshow') ? 'active' : '' }} {{ request()->routeIs('termspolicy') ? 'active' : '' }} {{ request()->routeIs('refsetshow') ? 'active' : '' }} {{ request()->routeIs('paymentview') ? 'active' : '' }} {{ request()->routeIs('subview') ? 'active' : '' }} {{ request()->routeIs('frontpage') ? 'active' : '' }} {{ request()->routeIs('allipaddress') ? 'active' : '' }} {{ request()->routeIs('ipaddress') ? 'active' : '' }} {{ request()->routeIs('editpaymethod') ? 'active' : '' }} {{ request()->routeIs('managecryptoasset') ? 'active' : '' }}">
+                        class="nav-item {{ request()->routeIs('appsettingshow') ? 'active' : '' }} {{ request()->routeIs('termspolicy') ? 'active' : '' }} {{ request()->routeIs('refsetshow') ? 'active' : '' }} {{ request()->routeIs('paymentview') ? 'active' : '' }} {{ request()->routeIs('subview') ? 'active' : '' }} {{ request()->routeIs('frontpage') ? 'active' : '' }} {{ request()->routeIs('allipaddress') ? 'active' : '' }} {{ request()->routeIs('ipaddress') ? 'active' : '' }} {{ request()->routeIs('editpaymethod') ? 'active' : '' }} {{ request()->routeIs('managecryptoasset') ? 'active' : '' }} {{ request()->routeIs('admin.license.*') ? 'active' : '' }}">
                         <a data-toggle="collapse" href="#settings">
                             <i class="ri-settings-3-line"></i>
                             <p>Settings</p>
@@ -343,6 +343,11 @@
                                 <li>
                                     <a href="{{ route('admin.appearance') }}">
                                         <span class="sub-item">Appearance Settings</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.license.index') }}">
+                                        <span class="sub-item">License Manager</span>
                                     </a>
                                 </li>
                                 {{-- <li>

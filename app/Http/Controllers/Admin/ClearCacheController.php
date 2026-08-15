@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Http;
 
 class ClearCacheController extends Controller
 {
@@ -18,13 +17,6 @@ class ClearCacheController extends Controller
 
     public function saveLicense()
     {
-        $website = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']
-            === 'on' ? "https" : "http") .
-            "://" . $_SERVER['HTTP_HOST'];
-
-        $response = Http::post('http://127.0.0.1:8080/api/v1/save-license', [
-            'license' => 'enter license here after verification is done',
-            'website' => $website
-        ]);
+        return redirect()->route('admin.license.index');
     }
 }
