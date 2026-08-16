@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Settings;
 use App\Models\Plans;
 use App\Models\Faq;
+use App\Models\Content;
+use App\Models\Images;
 use App\Models\Testimony;
 use App\Models\Deposit;
 use App\Models\Withdrawal;
@@ -19,6 +21,8 @@ class HomePageController extends Controller
 {
     public function index(){
         $settings=Settings::where('id', '=', '1')->first();
+        $cmsContent = Content::all()->keyBy('title');
+        $cmsImages = Images::all()->keyBy('title');
         //sum total deposited
         $total_deposits = Deposit::where('status','processed')->sum('amount');
         
@@ -43,6 +47,8 @@ class HomePageController extends Controller
             'title' => $settings->site_title,
             'mplans' => Plans::where('type','Main')->get(),
             'pplans' => Plans::where('type','Promo')->get(),
+            'cmsContent' => $cmsContent,
+            'cmsImages' => $cmsImages,
         ));
     }
 

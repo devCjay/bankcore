@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BankCore Documentation</title>
+    <style>
+        :root {
+            --bg: #f7fafc;
+            --surface: #ffffff;
+            --surface-2: #eef8f5;
+            --text: #0d1b2a;
+            --muted: #64748b;
+            --line: rgba(13, 27, 42, .1);
+            --primary: #13b981;
+            --primary-dark: #079667;
+            --blue: #2563eb;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --shadow: 0 22px 70px rgba(13, 27, 42, .1);
+            --code: #071118;
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 8% 4%, rgba(19, 185, 129, .18), transparent 26rem),
+                radial-gradient(circle at 90% 8%, rgba(37, 99, 235, .12), transparent 28rem),
+                var(--bg);
+        }
+
+        a { color: inherit; text-decoration: none; }
+        code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 300px minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 24px;
+            border-right: 1px solid var(--line);
+            background: rgba(255, 255, 255, .84);
+            backdrop-filter: blur(18px);
+            overflow-y: auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--blue));
+            box-shadow: 0 12px 30px rgba(19, 185, 129, .28);
+        }
+
+        .search {
+            width: 100%;
+            height: 44px;
+            margin-bottom: 18px;
+            padding: 0 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            outline: none;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .search:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(19, 185, 129, .14);
+        }
+
+        .nav {
+            display: grid;
+            gap: 6px;
+        }
+
+        .nav a {
+            display: block;
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            color: var(--primary-dark);
+            background: var(--surface-2);
+        }
+
+        .main {
+            width: min(1050px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 36px 0 80px;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 46px;
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            background:
+                linear-gradient(135deg, rgba(19, 185, 129, .14), rgba(37, 99, 235, .09)),
+                rgba(255, 255, 255, .9);
+            box-shadow: var(--shadow);
+        }
+
+        .hero:after {
+            content: "";
+            position: absolute;
+            inset: auto -80px -140px auto;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(19, 185, 129, .28), transparent 68%);
+            animation: glow 5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { transform: translateY(0); opacity: .58; }
+            to { transform: translateY(-24px); opacity: 1; }
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            color: var(--primary-dark);
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .pulse {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: var(--primary);
+            box-shadow: 0 0 0 0 rgba(19, 185, 129, .55);
+            animation: pulse 1.8s ease-out infinite;
+        }
+
+        @keyframes pulse {
+            to { box-shadow: 0 0 0 16px rgba(19, 185, 129, 0); }
+        }
+
+        h1 {
+            max-width: 780px;
+            margin: 0;
+            font-size: clamp(38px, 6vw, 72px);
+            line-height: 1;
+            letter-spacing: 0;
+        }
+
+        .hero p {
+            max-width: 760px;
+            margin: 20px 0 0;
+            color: var(--muted);
+            font-size: 18px;
+            line-height: 1.75;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 26px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 46px;
+            padding: 0 18px;
+            border-radius: 12px;
+            font-weight: 900;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--blue));
+            box-shadow: 0 16px 34px rgba(19, 185, 129, .22);
+        }
+
+        .btn.secondary {
+            color: var(--text);
+            background: #fff;
+            border: 1px solid var(--line);
+            box-shadow: none;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .card,
+        .doc-section {
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, .92);
+            box-shadow: 0 16px 50px rgba(13, 27, 42, .07);
+        }
+
+        .card {
+            padding: 22px;
+        }
+
+        .card strong {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .card span {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .doc-section {
+            margin-top: 22px;
+            padding: 32px;
+            scroll-margin-top: 24px;
+        }
+
+        .doc-section h2 {
+            margin: 0 0 18px;
+            font-size: clamp(26px, 3vw, 38px);
+            letter-spacing: 0;
+        }
+
+        .doc-section h3 {
+            margin: 26px 0 10px;
+            font-size: 20px;
+        }
+
+        p,
+        li {
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        ul,
+        ol {
+            padding-left: 22px;
+        }
+
+        .check-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .check-grid li {
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fff;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .check-grid li:before {
+            content: "✓";
+            margin-right: 8px;
+            color: var(--primary-dark);
+            font-weight: 900;
+        }
+
+        .callout {
+            margin: 18px 0;
+            padding: 16px 18px;
+            border-left: 4px solid var(--primary);
+            border-radius: 12px;
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        .callout.warning {
+            border-left-color: var(--warning);
+            background: #fff7ed;
+        }
+
+        .code-wrap {
+            position: relative;
+            margin: 14px 0;
+        }
+
+        pre {
+            margin: 0;
+            padding: 18px;
+            overflow-x: auto;
+            border-radius: 14px;
+            background: var(--code);
+            color: #d9fbe8;
+            line-height: 1.7;
+        }
+
+        .copy {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: 0;
+            border-radius: 10px;
+            padding: 7px 10px;
+            color: #fff;
+            background: rgba(255, 255, 255, .14);
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 14px;
+        }
+
+        .table th,
+        .table td {
+            padding: 13px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .table th {
+            color: var(--text);
+            background: var(--surface-2);
+        }
+
+        .table td {
+            color: var(--muted);
+            background: #fff;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        @media (max-width: 980px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar {
+                position: static;
+                height: auto;
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+            .nav {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .cards,
+            .check-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero,
+            .doc-section {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark">B</span>
+                <span>BankCore Docs</span>
+            </div>
+            <input class="search" type="search" placeholder="Search guide..." data-search>
+            <nav class="nav" data-nav>
+                <a href="#requirements">Requirements</a>
+                <a href="#upload">Upload</a>
+                <a href="#database">Database</a>
+                <a href="#license">License</a>
+                <a href="#portal">License Portal</a>
+                <a href="#first-admin">Create Admin</a>
+                <a href="#admin">Admin Login</a>
+                <a href="#smtp">SMTP</a>
+                <a href="#payments">Payments</a>
+                <a href="#cms">Frontend CMS</a>
+                <a href="#appearance">Appearance</a>
+                <a href="#issues">cPanel Issues</a>
+                <a href="#checklist">Checklist</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <section class="hero">
+                <div class="eyebrow"><span class="pulse"></span> Buyer installation guide</div>
+                <h1>Install, configure, and launch BankCore with confidence.</h1>
+                <p>A web-based guide for cPanel deployment, license verification, SMTP, payment gateways, frontend CMS setup, and common hosting fixes.</p>
+                <div class="quick-actions">
+                    <a class="btn" href="../install">Open Installer</a>
+                    <a class="btn secondary" href="../admin/login">Admin Login</a>
+                    <a class="btn secondary" href="PURCHASE_INSTALLATION_GUIDE.md">Markdown Guide</a>
+                </div>
+            </section>
+
+            <div class="cards">
+                <div class="card"><strong>01</strong><span>Prepare PHP extensions and writable folders before installation.</span></div>
+                <div class="card"><strong>02</strong><span>Run the installer, validate license, connect MySQL, import SQL, and create the first admin.</span></div>
+                <div class="card"><strong>03</strong><span>Configure SMTP, payment gateways, frontend CMS, and appearance.</span></div>
+            </div>
+
+            <section id="requirements" class="doc-section" data-section>
+                <h2>1. Server Requirements</h2>
+                <p>Use cPanel MultiPHP Manager or Select PHP Version and enable the required PHP extensions.</p>
+                <ul class="check-grid">
+                    <li>PHP 7.3 or newer</li>
+                    <li>bcmath</li>
+                    <li>ctype</li>
+                    <li>curl</li>
+                    <li>fileinfo</li>
+                    <li>json</li>
+                    <li>mbstring</li>
+                    <li>openssl</li>
+                    <li>pdo</li>
+                    <li>pdo_mysql</li>
+                    <li>tokenizer</li>
+                    <li>xml</li>
+                    <li>zip</li>
+                </ul>
+                <h3>Writable folders</h3>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>storage
+storage/app
+storage/app/public
+storage/framework
+storage/framework/cache
+storage/framework/cache/data
+storage/framework/sessions
+storage/framework/views
+storage/logs
+bootstrap/cache</code></pre></div>
+                <div class="callout">Recommended permissions are usually <code>755</code> for folders and <code>644</code> for files. Some hosts require <code>775</code> for <code>storage</code> and <code>bootstrap/cache</code>.</div>
+            </section>
+
+            <section id="upload" class="doc-section" data-section>
+                <h2>2. Upload Files to cPanel</h2>
+                <ol>
+                    <li>Upload the project files to your domain root or subfolder.</li>
+                    <li>Upload <code>vendor</code> if Composer is not available on the server.</li>
+                    <li>Delete any local-development <code>.env</code> before a fresh install.</li>
+                    <li>Delete stale cache files if present.</li>
+                    <li>Visit the installer URL.</li>
+                </ol>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>bootstrap/cache/config.php
+bootstrap/cache/routes.php
+bootstrap/cache/events.php</code></pre></div>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>https://your-domain.com/install</code></pre></div>
+                <p>The installer checks PHP, extensions, permissions, license, database connection, imports the bundled SQL file, and then asks you to create the first Super Admin account as the final step.</p>
+            </section>
+
+            <section id="database" class="doc-section" data-section>
+                <h2>3. Database Setup</h2>
+                <ol>
+                    <li>Open MySQL Databases in cPanel.</li>
+                    <li>Create a database.</li>
+                    <li>Create a database user.</li>
+                    <li>Assign the user to the database with all privileges.</li>
+                    <li>Enter the database details in the installer.</li>
+                </ol>
+                <table class="table">
+                    <tr><th>Field</th><th>Common value</th></tr>
+                    <tr><td>Host</td><td><code>localhost</code></td></tr>
+                    <tr><td>Port</td><td><code>3306</code></td></tr>
+                    <tr><td>Database</td><td>Your cPanel database name</td></tr>
+                    <tr><td>Username</td><td>Your cPanel database user</td></tr>
+                    <tr><td>Password</td><td>Your database user password</td></tr>
+                </table>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>DATABASE/database.sql</code></pre></div>
+            </section>
+
+            <section id="license" class="doc-section" data-section>
+                <h2>4. License Verification</h2>
+                <p>BankCore supports license verification during install and from the admin panel.</p>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>INSTALL_LICENSE_ENDPOINT=https://your-license-portal.com/api/verify-license</code></pre></div>
+                <p>If no endpoint is set, the license is stored locally. For production sales, use the separate license portal and point the banking app to its API.</p>
+                <div class="callout">Admin location: <strong>Admin Panel -> Settings -> License Manager</strong></div>
+            </section>
+
+            <section id="portal" class="doc-section" data-section>
+                <h2>5. License Portal Setup</h2>
+                <p>The separate license portal project lives in:</p>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>C:\Build\repo\bankcore-license-portal</code></pre></div>
+                <ol>
+                    <li>Upload the portal to a separate domain or subdomain.</li>
+                    <li>Configure the portal <code>.env</code>.</li>
+                    <li>Use MySQL for production if possible.</li>
+                    <li>Run migrations if SSH is available.</li>
+                    <li>Login and create licenses.</li>
+                </ol>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>APP_NAME="BankCore License Portal"
+APP_URL=https://licenses.yourcompany.com
+LICENSE_PORTAL_PASSWORD=ChangeThisPassword</code></pre></div>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=your_license_db
+DB_USERNAME=your_license_user
+DB_PASSWORD=your_password</code></pre></div>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>php artisan migrate --force</code></pre></div>
+                <h3>API payload</h3>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>{
+  "license_key": "BANK-XXXXXX-XXXXXX-XXXXXX-XXXXXX",
+  "domain": "client-domain.com",
+  "email": "client@example.com",
+  "product": "BankCore"
+}</code></pre></div>
+            </section>
+
+            <section id="first-admin" class="doc-section" data-section>
+                <h2>6. Create the First Admin</h2>
+                <p>After the database import finishes, the installer shows the final admin creation step. The installer locks only after this account is created.</p>
+                <ul class="check-grid">
+                    <li>First name</li>
+                    <li>Last name</li>
+                    <li>Email address</li>
+                    <li>Phone number</li>
+                    <li>Password</li>
+                    <li>Password confirmation</li>
+                </ul>
+                <div class="callout">This account is created as the first <strong>Super Admin</strong>.</div>
+            </section>
+
+            <section id="admin" class="doc-section" data-section>
+                <h2>7. Admin Login</h2>
+                <p>After installation, open the admin login page and create or update admin users from the admin panel.</p>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>https://your-domain.com/admin/login</code></pre></div>
+            </section>
+
+            <section id="smtp" class="doc-section" data-section>
+                <h2>8. SMTP Setup</h2>
+                <p>Open <strong>Admin Panel -> Settings -> App Settings -> Email Settings</strong>.</p>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>Mail Server: smtp
+SMTP Host: mail.your-domain.com
+SMTP Port: 465 or 587
+SMTP Encryption: ssl for 465, tls for 587
+SMTP Username: your mailbox email
+SMTP Password: mailbox password
+From Email: your mailbox email
+From Name: your bank name</code></pre></div>
+                <div class="callout warning">For cPanel email, create the mailbox first under Email Accounts, then copy the manual mail client settings.</div>
+                <ul>
+                    <li>Confirm DNS MX records are correct.</li>
+                    <li>Confirm SMTP password is correct.</li>
+                    <li>Try port <code>587</code> with <code>tls</code>.</li>
+                    <li>Ask the host if outbound SMTP is blocked.</li>
+                    <li>Clear app cache from admin after saving settings.</li>
+                </ul>
+            </section>
+
+            <section id="payments" class="doc-section" data-section>
+                <h2>9. Payment Setup</h2>
+                <p>Payment settings are managed from <strong>Admin Panel -> Settings -> Payment Settings</strong>.</p>
+                <ul>
+                    <li>Add deposit and withdrawal methods.</li>
+                    <li>Add manual bank transfer details.</li>
+                    <li>Configure gateway API keys where supported.</li>
+                    <li>Confirm gateway webhook/callback URLs match your live domain.</li>
+                    <li>Keep test keys separate from live keys.</li>
+                </ul>
+                <table class="table">
+                    <tr><th>Gateway</th><th>Setup notes</th></tr>
+                    <tr><td>Paystack</td><td>Create account, copy public and secret keys, add keys under Payment Settings, test a small deposit.</td></tr>
+                    <tr><td>Flutterwave</td><td>Copy public key, secret key, and secret hash. Confirm callback URL points to the live domain.</td></tr>
+                    <tr><td>Stripe</td><td>Copy publishable and secret keys. Use live keys only after testing.</td></tr>
+                </table>
+            </section>
+
+            <section id="cms" class="doc-section" data-section>
+                <h2>10. Frontend CMS Setup</h2>
+                <p>The landing page is CMS-ready. Open <strong>Admin Panel -> Settings -> Front Page</strong>.</p>
+                <ul>
+                    <li><strong>Website Contents</strong> controls landing text, button labels, and URLs.</li>
+                    <li><strong>Images</strong> controls landing images.</li>
+                    <li><strong>FAQ(s)</strong> controls FAQ content.</li>
+                    <li><strong>Testimonials</strong> controls testimonials where used.</li>
+                </ul>
+                <p>For landing content, add a Website Content entry where <strong>Title of Content</strong> is the CMS key and <strong>Content Description</strong> is the text or URL value.</p>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>home.hero.eyebrow
+home.hero.title.line1
+home.hero.description
+home.hero.primary_button
+home.hero.primary_url
+home.features.heading
+home.feature.1.title
+home.feature.1.description
+home.cta.heading</code></pre></div>
+                <p>For landing images, upload an image and set <strong>Title of Image</strong> to one of these keys:</p>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>home.visual.phone.image
+home.security.image.large
+home.security.image.small
+home.app.image
+home.testimonial.1.image
+home.testimonial.2.image
+home.testimonial.3.image</code></pre></div>
+                <div class="callout">If a CMS key is missing, the landing page uses the built-in default text or image.</div>
+            </section>
+
+            <section id="appearance" class="doc-section" data-section>
+                <h2>11. Appearance and Theme Colors</h2>
+                <p>Open <strong>Admin Panel -> Appearance Settings</strong>.</p>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>Primary: #13b981
+Primary Dark: #079667
+Secondary: #2563eb
+Text: #0d1b2a
+Background: #f7fafc</code></pre></div>
+            </section>
+
+            <section id="issues" class="doc-section" data-section>
+                <h2>12. Common cPanel Issues</h2>
+                <h3>Please provide a valid cache path</h3>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>storage/framework/views
+storage/framework/cache/data
+storage/framework/sessions
+bootstrap/cache</code></pre></div>
+                <p>Create these folders if missing, then make them writable.</p>
+
+                <h3>App still tries to connect to database before install</h3>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>.env
+storage/installed
+bootstrap/cache/config.php
+bootstrap/cache/routes.php
+bootstrap/cache/events.php</code></pre></div>
+                <p>Delete those files, then revisit <code>/install</code>.</p>
+
+                <h3>500 error after moving to server</h3>
+                <ul>
+                    <li>Confirm <code>.env</code> exists after install.</li>
+                    <li>Confirm <code>APP_KEY</code> is set.</li>
+                    <li>Confirm PHP extensions are enabled.</li>
+                    <li>Confirm <code>storage</code> and <code>bootstrap/cache</code> are writable.</li>
+                    <li>Confirm database credentials are correct.</li>
+                    <li>Confirm <code>APP_URL</code> matches the live domain.</li>
+                </ul>
+
+                <h3>Email verification or KYC settings</h3>
+                <div class="code-wrap"><button class="copy">Copy</button><pre><code>enable_verification
+enable_kyc
+enable_kyc_registration</code></pre></div>
+            </section>
+
+            <section id="checklist" class="doc-section" data-section>
+                <h2>13. Post-Install Checklist</h2>
+                <ul class="check-grid">
+                    <li>Set site name, URL, logo, and favicon.</li>
+                    <li>Configure SMTP.</li>
+                    <li>Configure payment methods/gateways.</li>
+                    <li>Create or update admin users.</li>
+                    <li>Set frontend CMS content.</li>
+                    <li>Review Appearance Settings.</li>
+                    <li>Test registration.</li>
+                    <li>Test login.</li>
+                    <li>Test deposit and withdrawal workflow.</li>
+                    <li>Test password reset and email delivery.</li>
+                    <li>Confirm license status in License Manager.</li>
+                </ul>
+            </section>
+
+            <p class="footer">BankCore Documentation. Keep this guide bundled with every buyer package.</p>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            var search = document.querySelector('[data-search]');
+            var sections = Array.prototype.slice.call(document.querySelectorAll('[data-section]'));
+            var navLinks = Array.prototype.slice.call(document.querySelectorAll('[data-nav] a'));
+
+            search.addEventListener('input', function () {
+                var term = search.value.trim().toLowerCase();
+
+                sections.forEach(function (section) {
+                    section.style.display = !term || section.textContent.toLowerCase().indexOf(term) !== -1 ? '' : 'none';
+                });
+            });
+
+            document.querySelectorAll('.copy').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var code = button.parentElement.querySelector('code').innerText;
+                    navigator.clipboard.writeText(code).then(function () {
+                        var old = button.innerText;
+                        button.innerText = 'Copied';
+                        setTimeout(function () { button.innerText = old; }, 1200);
+                    });
+                });
+            });
+
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) {
+                        return;
+                    }
+
+                    navLinks.forEach(function (link) {
+                        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+                    });
+                });
+            }, { rootMargin: '-30% 0px -65% 0px' });
+
+            sections.forEach(function (section) {
+                observer.observe(section);
+            });
+        })();
+    </script>
+</body>
+</html>

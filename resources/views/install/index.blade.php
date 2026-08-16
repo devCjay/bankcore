@@ -109,7 +109,7 @@
 </head>
 <body>
     @php
-        $steps = ['requirements' => 'Requirements', 'license' => 'License', 'database' => 'Database', 'import' => 'Import', 'complete' => 'Complete'];
+        $steps = ['requirements' => 'Requirements', 'license' => 'License', 'database' => 'Database', 'import' => 'Import', 'admin' => 'Create Admin', 'complete' => 'Complete'];
         $allChecksPassed = collect($checks)->every(function ($check) {
             return $check['ok'];
         });
@@ -230,20 +230,53 @@
                 @elseif ($step === 'import')
                     <div class="card">
                         <h2>Import database file</h2>
-                        <p>The installer will import the bundled SQL file into the verified database and then write the .env configuration.</p>
+                        <p>The installer will import the bundled SQL file into the verified database. The installer will stay unlocked until the first admin is created.</p>
                         <p class="small">SQL file: {{ $databaseFile ?: 'Missing' }}</p>
                         <form class="form" method="post" action="{{ route('install.import.run') }}">
                             @csrf
                             <div class="actions">
-                                <button class="btn" type="submit">Import and finish</button>
+                                <button class="btn" type="submit">Import database</button>
                                 <a class="btn secondary" href="{{ route('install.database') }}">Back</a>
+                            </div>
+                        </form>
+                    </div>
+                @elseif ($step === 'admin')
+                    <div class="card">
+                        <h2>Create first admin</h2>
+                        <p>This Super Admin account will be used to log in after installation. The installer locks only after this account is created.</p>
+                        <form class="form" method="post" action="{{ route('install.admin.save') }}">
+                            @csrf
+                            <div class="row">
+                                <label>First name
+                                    <input name="first_name" value="{{ old('first_name') }}" required>
+                                </label>
+                                <label>Last name
+                                    <input name="last_name" value="{{ old('last_name') }}" required>
+                                </label>
+                            </div>
+                            <label>Email address
+                                <input type="email" name="email" value="{{ old('email') }}" required>
+                            </label>
+                            <label>Phone number
+                                <input name="phone" value="{{ old('phone') }}">
+                            </label>
+                            <div class="row">
+                                <label>Password
+                                    <input type="password" name="password" required>
+                                </label>
+                                <label>Confirm password
+                                    <input type="password" name="password_confirmation" required>
+                                </label>
+                            </div>
+                            <div class="actions">
+                                <button class="btn" type="submit">Create admin and lock installer</button>
                             </div>
                         </form>
                     </div>
                 @elseif ($step === 'complete')
                     <div class="card">
                         <h2>Installation complete</h2>
-                        <p>The application is configured, the database file has been imported, and the installer is now locked.</p>
+                        <p>The application is configured, the database file has been imported, the first admin is ready, and the installer is now locked.</p>
                         <div class="actions">
                             <a class="btn" href="{{ url('/') }}">Open site</a>
                             <a class="btn secondary" href="{{ url('/admin/login') }}">Admin login</a>

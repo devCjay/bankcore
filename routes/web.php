@@ -26,6 +26,8 @@ Route::prefix('install')->name('install.')->group(function () {
 	Route::post('/database', [InstallController::class, 'saveDatabase'])->name('database.save');
 	Route::get('/import', [InstallController::class, 'import'])->name('import');
 	Route::post('/import', [InstallController::class, 'runImport'])->name('import.run');
+	Route::get('/admin', [InstallController::class, 'admin'])->name('admin');
+	Route::post('/admin', [InstallController::class, 'saveAdmin'])->name('admin.save');
 	Route::get('/complete', [InstallController::class, 'complete'])->name('complete');
 });
 

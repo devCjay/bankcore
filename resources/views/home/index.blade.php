@@ -2,6 +2,20 @@
 @section('title', 'Home')
 
 @section('content')
+@php
+    $cmsText = function ($key, $fallback = '') use ($cmsContent) {
+        return optional($cmsContent->get($key))->description ?: $fallback;
+    };
+
+    $cmsImage = function ($key, $fallback) use ($cmsImages) {
+        $path = optional($cmsImages->get($key))->img_path;
+        return $path ? asset('storage/app/public/' . $path) : asset($fallback);
+    };
+
+    $cmsUrl = function ($key, $fallback = '#') use ($cmsContent) {
+        return optional($cmsContent->get($key))->description ?: $fallback;
+    };
+@endphp
 <style>
     :root {
         --bank-bg: #f7fafc;
@@ -402,7 +416,7 @@
 
     .bank-phone-hero {
         height: 170px;
-        background: url("{{ asset('temp/custom/assets/img/hero/hero-img-5.jpg') }}") center/cover;
+        background: url("{{ $cmsImage('home.visual.phone.image', 'temp/custom/assets/img/hero/hero-img-5.jpg') }}") center/cover;
     }
 
     .bank-phone-content {
@@ -1190,31 +1204,31 @@
         <div class="bank-container">
             <div class="bank-hero-grid">
                 <div data-bank-reveal>
-                    <div class="bank-eyebrow"><span class="bank-pulse"></span> Secure digital banking</div>
+                    <div class="bank-eyebrow"><span class="bank-pulse"></span> {{ $cmsText('home.hero.eyebrow', 'Secure digital banking') }}</div>
                     <h1>
-                        <span class="bank-hero-line">Bank smarter</span>
-                        <span class="bank-hero-line">with a <span class="bank-accent-word">cleaner</span></span>
-                        <span class="bank-hero-line">way to move money.</span>
+                        <span class="bank-hero-line">{{ $cmsText('home.hero.title.line1', 'Bank smarter') }}</span>
+                        <span class="bank-hero-line">{{ $cmsText('home.hero.title.line2', 'with a cleaner') }}</span>
+                        <span class="bank-hero-line">{{ $cmsText('home.hero.title.line3', 'way to move money.') }}</span>
                     </h1>
                     <p class="bank-lead">
-                        {{ $settings->site_name }} brings accounts, cards, transfers, loans, and support into one fast online banking experience built for modern customers and growing businesses.
+                        {{ $cmsText('home.hero.description', $settings->site_name . ' brings accounts, cards, transfers, loans, and support into one fast online banking experience built for modern customers and growing businesses.') }}
                     </p>
                     <div class="bank-hero-actions">
-                        <a href="{{ url('login') }}" class="bank-btn">Open online banking <i class="ri-arrow-right-line"></i></a>
-                        <a href="{{ url('register') }}" class="bank-btn secondary">Create account</a>
+                        <a href="{{ $cmsUrl('home.hero.primary_url', url('login')) }}" class="bank-btn">{{ $cmsText('home.hero.primary_button', 'Open online banking') }} <i class="ri-arrow-right-line"></i></a>
+                        <a href="{{ $cmsUrl('home.hero.secondary_url', url('register')) }}" class="bank-btn secondary">{{ $cmsText('home.hero.secondary_button', 'Create account') }}</a>
                     </div>
                     <div class="bank-trust-row">
                         <div class="bank-stat">
                             <strong>{{ number_format($total_users) }}+</strong>
-                            <span>Customers onboarded</span>
+                            <span>{{ $cmsText('home.stat.1.label', 'Customers onboarded') }}</span>
                         </div>
                         <div class="bank-stat">
-                            <strong>24/7</strong>
-                            <span>Digital account access</span>
+                            <strong>{{ $cmsText('home.stat.2.value', '24/7') }}</strong>
+                            <span>{{ $cmsText('home.stat.2.label', 'Digital account access') }}</span>
                         </div>
                         <div class="bank-stat">
-                            <strong>256-bit</strong>
-                            <span>Security-first encryption</span>
+                            <strong>{{ $cmsText('home.stat.3.value', '256-bit') }}</strong>
+                            <span>{{ $cmsText('home.stat.3.label', 'Security-first encryption') }}</span>
                         </div>
                     </div>
                 </div>
@@ -1227,17 +1241,17 @@
                                 <strong>{{ $settings->site_name }}</strong>
                             </div>
                             <div class="bank-card-balance">
-                                <span>Available balance</span>
-                                <strong>$24,850.00</strong>
+                                <span>{{ $cmsText('home.visual.card.label', 'Available balance') }}</span>
+                                <strong>{{ $cmsText('home.visual.card.amount', '$24,850.00') }}</strong>
                             </div>
                             <div class="bank-card-bottom">
                                 <div>
-                                    <span>Card holder</span>
-                                    <strong>Digital Client</strong>
+                                    <span>{{ $cmsText('home.visual.card.holder_label', 'Card holder') }}</span>
+                                    <strong>{{ $cmsText('home.visual.card.holder', 'Digital Client') }}</strong>
                                 </div>
                                 <div>
-                                    <span>Status</span>
-                                    <strong>Active</strong>
+                                    <span>{{ $cmsText('home.visual.card.status_label', 'Status') }}</span>
+                                    <strong>{{ $cmsText('home.visual.card.status', 'Active') }}</strong>
                                 </div>
                             </div>
                         </div>
@@ -1247,18 +1261,18 @@
                         <div class="bank-phone-screen">
                             <div class="bank-phone-hero"></div>
                             <div class="bank-phone-content">
-                                <div class="bank-mini-row"><span>Transfer sent</span><strong>$1,250</strong></div>
-                                <div class="bank-mini-row"><span>Card payment</span><strong>$89.40</strong></div>
-                                <div class="bank-mini-row"><span>Savings goal</span><strong>74%</strong></div>
+                                <div class="bank-mini-row"><span>{{ $cmsText('home.visual.phone.row1.label', 'Transfer sent') }}</span><strong>{{ $cmsText('home.visual.phone.row1.value', '$1,250') }}</strong></div>
+                                <div class="bank-mini-row"><span>{{ $cmsText('home.visual.phone.row2.label', 'Card payment') }}</span><strong>{{ $cmsText('home.visual.phone.row2.value', '$89.40') }}</strong></div>
+                                <div class="bank-mini-row"><span>{{ $cmsText('home.visual.phone.row3.label', 'Savings goal') }}</span><strong>{{ $cmsText('home.visual.phone.row3.value', '74%') }}</strong></div>
                             </div>
                         </div>
                     </div>
 
                     <div class="bank-floating-panel">
-                        <h3>Monthly cashflow</h3>
+                        <h3>{{ $cmsText('home.visual.cashflow.title', 'Monthly cashflow') }}</h3>
                         <div class="bank-progress"><span></span></div>
-                        <div class="bank-mini-row"><span>Income</span><strong>+18.6%</strong></div>
-                        <div class="bank-mini-row"><span>Spend control</span><strong>On track</strong></div>
+                        <div class="bank-mini-row"><span>{{ $cmsText('home.visual.cashflow.row1.label', 'Income') }}</span><strong>{{ $cmsText('home.visual.cashflow.row1.value', '+18.6%') }}</strong></div>
+                        <div class="bank-mini-row"><span>{{ $cmsText('home.visual.cashflow.row2.label', 'Spend control') }}</span><strong>{{ $cmsText('home.visual.cashflow.row2.value', 'On track') }}</strong></div>
                     </div>
                 </div>
             </div>
@@ -1268,27 +1282,27 @@
     <section class="bank-section">
         <div class="bank-container">
             <div class="bank-section-head" data-bank-reveal>
-                <h2>Everything customers expect from online banking.</h2>
-                <p>Clear tools for everyday banking, global transfers, card controls, and support without the clutter.</p>
+                <h2>{{ $cmsText('home.features.heading', 'Everything customers expect from online banking.') }}</h2>
+                <p>{{ $cmsText('home.features.description', 'Clear tools for everyday banking, global transfers, card controls, and support without the clutter.') }}</p>
             </div>
             <div class="bank-grid">
                 <article class="bank-feature-card" data-bank-reveal>
                     <span class="bank-icon"><i class="ri-exchange-dollar-line"></i></span>
-                    <h3>Instant transfers</h3>
-                    <p>Move money between accounts, send to other customers, and track every transaction from a clean dashboard.</p>
-                    <a class="bank-card-link" href="{{ url('login') }}">Send money <i class="ri-arrow-right-line"></i></a>
+                    <h3>{{ $cmsText('home.feature.1.title', 'Instant transfers') }}</h3>
+                    <p>{{ $cmsText('home.feature.1.description', 'Move money between accounts, send to other customers, and track every transaction from a clean dashboard.') }}</p>
+                    <a class="bank-card-link" href="{{ $cmsUrl('home.feature.1.url', url('login')) }}">{{ $cmsText('home.feature.1.link', 'Send money') }} <i class="ri-arrow-right-line"></i></a>
                 </article>
                 <article class="bank-feature-card" data-bank-reveal>
                     <span class="bank-icon"><i class="ri-bank-card-line"></i></span>
-                    <h3>Smart cards</h3>
-                    <p>Apply for cards, manage limits, review card transactions, and block or activate cards when needed.</p>
-                    <a class="bank-card-link" href="{{ url('cards') }}">Explore cards <i class="ri-arrow-right-line"></i></a>
+                    <h3>{{ $cmsText('home.feature.2.title', 'Smart cards') }}</h3>
+                    <p>{{ $cmsText('home.feature.2.description', 'Apply for cards, manage limits, review card transactions, and block or activate cards when needed.') }}</p>
+                    <a class="bank-card-link" href="{{ $cmsUrl('home.feature.2.url', url('cards')) }}">{{ $cmsText('home.feature.2.link', 'Explore cards') }} <i class="ri-arrow-right-line"></i></a>
                 </article>
                 <article class="bank-feature-card" data-bank-reveal>
                     <span class="bank-icon"><i class="ri-line-chart-line"></i></span>
-                    <h3>Financial insight</h3>
-                    <p>Readable activity views, balance summaries, notifications, and savings progress help customers stay in control.</p>
-                    <a class="bank-card-link" href="{{ url('personal') }}">View banking <i class="ri-arrow-right-line"></i></a>
+                    <h3>{{ $cmsText('home.feature.3.title', 'Financial insight') }}</h3>
+                    <p>{{ $cmsText('home.feature.3.description', 'Readable activity views, balance summaries, notifications, and savings progress help customers stay in control.') }}</p>
+                    <a class="bank-card-link" href="{{ $cmsUrl('home.feature.3.url', url('personal')) }}">{{ $cmsText('home.feature.3.link', 'View banking') }} <i class="ri-arrow-right-line"></i></a>
                 </article>
             </div>
         </div>
@@ -1299,38 +1313,38 @@
             <div class="bank-security">
                 <div class="bank-image-stack" data-bank-reveal>
                     <div class="bank-image-card large">
-                        <img src="{{ asset('temp/custom/assets/img/about/about-img-7.jpg') }}" alt="Customer using secure online banking">
+                        <img src="{{ $cmsImage('home.security.image.large', 'temp/custom/assets/img/about/about-img-7.jpg') }}" alt="Customer using secure online banking">
                     </div>
                     <div class="bank-image-card small">
-                        <img src="{{ asset('temp/custom/assets/img/why-choose-us/wh-img-6.jpg') }}" alt="Banking support specialist">
+                        <img src="{{ $cmsImage('home.security.image.small', 'temp/custom/assets/img/why-choose-us/wh-img-6.jpg') }}" alt="Banking support specialist">
                     </div>
                 </div>
                 <div data-bank-reveal>
-                    <div class="bank-eyebrow"><span class="bank-pulse"></span> Protected by design</div>
+                    <div class="bank-eyebrow"><span class="bank-pulse"></span> {{ $cmsText('home.security.eyebrow', 'Protected by design') }}</div>
                     <div class="bank-section-head" style="display:block;margin-bottom:0;">
-                        <h2>Modern security without slowing customers down.</h2>
-                        <p style="margin-top:18px;max-width:620px;">Security, verification, notifications, and account controls are built around fast daily banking workflows.</p>
+                        <h2>{{ $cmsText('home.security.heading', 'Modern security without slowing customers down.') }}</h2>
+                        <p style="margin-top:18px;max-width:620px;">{{ $cmsText('home.security.description', 'Security, verification, notifications, and account controls are built around fast daily banking workflows.') }}</p>
                     </div>
                     <div class="bank-security-list">
                         <div class="bank-glass-card">
                             <span class="bank-icon"><i class="ri-shield-check-line"></i></span>
                             <div>
-                                <h3>Layered protection</h3>
-                                <p>Sign-in checks, activity monitoring, and session-aware account tools reduce risk across the platform.</p>
+                                <h3>{{ $cmsText('home.security.card.1.title', 'Layered protection') }}</h3>
+                                <p>{{ $cmsText('home.security.card.1.description', 'Sign-in checks, activity monitoring, and session-aware account tools reduce risk across the platform.') }}</p>
                             </div>
                         </div>
                         <div class="bank-glass-card">
                             <span class="bank-icon"><i class="ri-notification-3-line"></i></span>
                             <div>
-                                <h3>Real-time alerts</h3>
-                                <p>Customers stay informed when transfers, account updates, card actions, or admin notices occur.</p>
+                                <h3>{{ $cmsText('home.security.card.2.title', 'Real-time alerts') }}</h3>
+                                <p>{{ $cmsText('home.security.card.2.description', 'Customers stay informed when transfers, account updates, card actions, or admin notices occur.') }}</p>
                             </div>
                         </div>
                         <div class="bank-glass-card">
                             <span class="bank-icon"><i class="ri-customer-service-2-line"></i></span>
                             <div>
-                                <h3>Human support</h3>
-                                <p>Contact and support workflows keep help close when customers need review, verification, or guidance.</p>
+                                <h3>{{ $cmsText('home.security.card.3.title', 'Human support') }}</h3>
+                                <p>{{ $cmsText('home.security.card.3.description', 'Contact and support workflows keep help close when customers need review, verification, or guidance.') }}</p>
                             </div>
                         </div>
                     </div>
@@ -1343,24 +1357,24 @@
         <div class="bank-container">
             <div class="bank-rates" data-bank-reveal>
                 <div class="bank-rate-card">
-                    <span>Processed deposits</span>
+                    <span>{{ $cmsText('home.metric.1.label', 'Processed deposits') }}</span>
                     <strong>${{ number_format((float) $total_deposits, 0) }}</strong>
-                    <em>Tracked in platform</em>
+                    <em>{{ $cmsText('home.metric.1.caption', 'Tracked in platform') }}</em>
                 </div>
                 <div class="bank-rate-card">
-                    <span>Processed withdrawals</span>
+                    <span>{{ $cmsText('home.metric.2.label', 'Processed withdrawals') }}</span>
                     <strong>${{ number_format((float) $total_withdrawals, 0) }}</strong>
-                    <em>Visible history</em>
+                    <em>{{ $cmsText('home.metric.2.caption', 'Visible history') }}</em>
                 </div>
                 <div class="bank-rate-card">
-                    <span>Digital products</span>
+                    <span>{{ $cmsText('home.metric.3.label', 'Digital products') }}</span>
                     <strong>{{ count($plans) }}+</strong>
-                    <em>Plans available</em>
+                    <em>{{ $cmsText('home.metric.3.caption', 'Plans available') }}</em>
                 </div>
                 <div class="bank-rate-card highlight">
-                    <span>Online readiness</span>
-                    <strong>Always on</strong>
-                    <em>Accounts, cards, loans, transfers, and support</em>
+                    <span>{{ $cmsText('home.metric.4.label', 'Online readiness') }}</span>
+                    <strong>{{ $cmsText('home.metric.4.value', 'Always on') }}</strong>
+                    <em>{{ $cmsText('home.metric.4.caption', 'Accounts, cards, loans, transfers, and support') }}</em>
                 </div>
             </div>
         </div>
@@ -1369,29 +1383,29 @@
     <section class="bank-section">
         <div class="bank-container">
             <div class="bank-section-head" data-bank-reveal>
-                <h2>Open an account in a few direct steps.</h2>
-                <p>The onboarding flow is simple enough for personal users and capable enough for business banking clients.</p>
+                <h2>{{ $cmsText('home.steps.heading', 'Open an account in a few direct steps.') }}</h2>
+                <p>{{ $cmsText('home.steps.description', 'The onboarding flow is simple enough for personal users and capable enough for business banking clients.') }}</p>
             </div>
             <div class="bank-steps">
                 <article class="bank-step" data-bank-reveal>
                     <span class="bank-step-number">1</span>
-                    <h3>Create profile</h3>
-                    <p>Register securely and start your online banking profile.</p>
+                    <h3>{{ $cmsText('home.step.1.title', 'Create profile') }}</h3>
+                    <p>{{ $cmsText('home.step.1.description', 'Register securely and start your online banking profile.') }}</p>
                 </article>
                 <article class="bank-step" data-bank-reveal>
                     <span class="bank-step-number">2</span>
-                    <h3>Verify account</h3>
-                    <p>Complete identity and account checks from the dashboard.</p>
+                    <h3>{{ $cmsText('home.step.2.title', 'Verify account') }}</h3>
+                    <p>{{ $cmsText('home.step.2.description', 'Complete identity and account checks from the dashboard.') }}</p>
                 </article>
                 <article class="bank-step" data-bank-reveal>
                     <span class="bank-step-number">3</span>
-                    <h3>Add funds</h3>
-                    <p>Deposit, transfer, or connect the products you use most.</p>
+                    <h3>{{ $cmsText('home.step.3.title', 'Add funds') }}</h3>
+                    <p>{{ $cmsText('home.step.3.description', 'Deposit, transfer, or connect the products you use most.') }}</p>
                 </article>
                 <article class="bank-step" data-bank-reveal>
                     <span class="bank-step-number">4</span>
-                    <h3>Bank daily</h3>
-                    <p>Manage transfers, cards, withdrawals, alerts, and support.</p>
+                    <h3>{{ $cmsText('home.step.4.title', 'Bank daily') }}</h3>
+                    <p>{{ $cmsText('home.step.4.description', 'Manage transfers, cards, withdrawals, alerts, and support.') }}</p>
                 </article>
             </div>
         </div>
@@ -1401,20 +1415,20 @@
         <div class="bank-container">
             <div class="bank-app">
                 <div data-bank-reveal>
-                    <div class="bank-eyebrow"><span class="bank-pulse"></span> Mobile-ready experience</div>
+                    <div class="bank-eyebrow"><span class="bank-pulse"></span> {{ $cmsText('home.app.eyebrow', 'Mobile-ready experience') }}</div>
                     <div class="bank-section-head" style="display:block;margin-bottom:0;">
-                        <h2>A dashboard built for quick decisions.</h2>
-                        <p style="margin-top:18px;max-width:630px;">Customers can understand balances, recent activity, card status, transfer options, and notifications without digging through dense screens.</p>
+                        <h2>{{ $cmsText('home.app.heading', 'A dashboard built for quick decisions.') }}</h2>
+                        <p style="margin-top:18px;max-width:630px;">{{ $cmsText('home.app.description', 'Customers can understand balances, recent activity, card status, transfer options, and notifications without digging through dense screens.') }}</p>
                     </div>
                     <ul class="bank-check-list">
-                        <li><i class="ri-check-line"></i><span>Responsive layout for mobile, tablet, and desktop banking.</span></li>
-                        <li><i class="ri-check-line"></i><span>Clean shadows, focused cards, and strong visual hierarchy.</span></li>
-                        <li><i class="ri-check-line"></i><span>Light and dark mode with persistent user preference.</span></li>
+                        <li><i class="ri-check-line"></i><span>{{ $cmsText('home.app.point.1', 'Responsive layout for mobile, tablet, and desktop banking.') }}</span></li>
+                        <li><i class="ri-check-line"></i><span>{{ $cmsText('home.app.point.2', 'Clean shadows, focused cards, and strong visual hierarchy.') }}</span></li>
+                        <li><i class="ri-check-line"></i><span>{{ $cmsText('home.app.point.3', 'Light and dark mode with persistent user preference.') }}</span></li>
                     </ul>
-                    <a href="{{ url('login') }}" class="bank-btn">Go to dashboard <i class="ri-arrow-right-line"></i></a>
+                    <a href="{{ $cmsUrl('home.app.button_url', url('login')) }}" class="bank-btn">{{ $cmsText('home.app.button', 'Go to dashboard') }} <i class="ri-arrow-right-line"></i></a>
                 </div>
                 <div class="bank-app-panel" data-bank-reveal>
-                    <img src="{{ asset('temp/custom/assets/img/about/converter-1.jpg') }}" alt="Online banking dashboard preview">
+                    <img src="{{ $cmsImage('home.app.image', 'temp/custom/assets/img/about/converter-1.jpg') }}" alt="Online banking dashboard preview">
                 </div>
             </div>
         </div>
@@ -1423,30 +1437,30 @@
     <section class="bank-section">
         <div class="bank-container">
             <div class="bank-section-head" data-bank-reveal>
-                <h2>Trusted by customers who bank online.</h2>
-                <p>Clear banking experiences reduce friction and make digital service feel more dependable.</p>
+                <h2>{{ $cmsText('home.testimonials.heading', 'Trusted by customers who bank online.') }}</h2>
+                <p>{{ $cmsText('home.testimonials.description', 'Clear banking experiences reduce friction and make digital service feel more dependable.') }}</p>
             </div>
             <div class="bank-testimonials">
                 <article class="bank-testimonial" data-bank-reveal>
                     <div class="bank-avatar">
-                        <img src="{{ asset('temp/custom/assets/img/testimonials/client-1.jpg') }}" alt="Customer portrait">
-                        <div><strong>Harry Jackson</strong><span>Entrepreneur</span></div>
+                        <img src="{{ $cmsImage('home.testimonial.1.image', 'temp/custom/assets/img/testimonials/client-1.jpg') }}" alt="Customer portrait">
+                        <div><strong>{{ $cmsText('home.testimonial.1.name', 'Harry Jackson') }}</strong><span>{{ $cmsText('home.testimonial.1.role', 'Entrepreneur') }}</span></div>
                     </div>
-                    <p>Transfers, card controls, and notifications are easy to find. The dashboard feels fast and focused.</p>
+                    <p>{{ $cmsText('home.testimonial.1.quote', 'Transfers, card controls, and notifications are easy to find. The dashboard feels fast and focused.') }}</p>
                 </article>
                 <article class="bank-testimonial" data-bank-reveal>
                     <div class="bank-avatar">
-                        <img src="{{ asset('temp/custom/assets/img/testimonials/client-5.jpg') }}" alt="Customer portrait">
-                        <div><strong>Tom Haris</strong><span>Engineer</span></div>
+                        <img src="{{ $cmsImage('home.testimonial.2.image', 'temp/custom/assets/img/testimonials/client-5.jpg') }}" alt="Customer portrait">
+                        <div><strong>{{ $cmsText('home.testimonial.2.name', 'Tom Haris') }}</strong><span>{{ $cmsText('home.testimonial.2.role', 'Engineer') }}</span></div>
                     </div>
-                    <p>I can review account history and support messages without feeling like I am searching through old banking software.</p>
+                    <p>{{ $cmsText('home.testimonial.2.quote', 'I can review account history and support messages without feeling like I am searching through old banking software.') }}</p>
                 </article>
                 <article class="bank-testimonial" data-bank-reveal>
                     <div class="bank-avatar">
-                        <img src="{{ asset('temp/custom/assets/img/testimonials/client-2.jpg') }}" alt="Customer portrait">
-                        <div><strong>Chris Haris</strong><span>Managing Director</span></div>
+                        <img src="{{ $cmsImage('home.testimonial.3.image', 'temp/custom/assets/img/testimonials/client-2.jpg') }}" alt="Customer portrait">
+                        <div><strong>{{ $cmsText('home.testimonial.3.name', 'Chris Haris') }}</strong><span>{{ $cmsText('home.testimonial.3.role', 'Managing Director') }}</span></div>
                     </div>
-                    <p>The platform gives our team a simple way to manage business banking tasks and keep records visible.</p>
+                    <p>{{ $cmsText('home.testimonial.3.quote', 'The platform gives our team a simple way to manage business banking tasks and keep records visible.') }}</p>
                 </article>
             </div>
         </div>
@@ -1456,12 +1470,12 @@
         <div class="bank-container">
             <div class="bank-cta" data-bank-reveal>
                 <div>
-                    <h2>Ready to bank with {{ $settings->site_name }}?</h2>
-                    <p>Open online banking, create a secure account, or speak with support to find the right personal or business banking path.</p>
+                    <h2>{{ $cmsText('home.cta.heading', 'Ready to bank with ' . $settings->site_name . '?') }}</h2>
+                    <p>{{ $cmsText('home.cta.description', 'Open online banking, create a secure account, or speak with support to find the right personal or business banking path.') }}</p>
                 </div>
                 <div class="bank-hero-actions" style="margin-top:0;">
-                    <a href="{{ url('register') }}" class="bank-btn">Get started</a>
-                    <a href="{{ url('contact') }}" class="bank-btn secondary">Contact support</a>
+                    <a href="{{ $cmsUrl('home.cta.primary_url', url('register')) }}" class="bank-btn">{{ $cmsText('home.cta.primary_button', 'Get started') }}</a>
+                    <a href="{{ $cmsUrl('home.cta.secondary_url', url('contact')) }}" class="bank-btn secondary">{{ $cmsText('home.cta.secondary_button', 'Contact support') }}</a>
                 </div>
             </div>
         </div>

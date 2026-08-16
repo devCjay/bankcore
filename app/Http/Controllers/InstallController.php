@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Support\Installation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use PDO;
@@ -132,20 +133,55 @@ class InstallController extends Controller
             $pdo = $this->connectToDatabase($database);
             $this->importSqlFile($pdo, $sqlFile);
             $this->updateSettingsAfterImport($pdo, $request);
-            $this->writeEnvironment(array_merge($this->databaseEnvironment($database), [
+            $this->updateEnvironmentForPendingInstall($request, $database, $license);
+            $request->session()->put('install.imported', true);
+        } catch (Throwable $exception) {
+            return back()->withErrors(['import' => 'Import failed: ' . $exception->getMessage()]);
+        }
+
+        return redirect()->route('install.admin')->with('success', 'Database imported. Create the first admin to finish installation.');
+    }
+
+    public function admin(Request $request)
+    {
+        if (!$request->session()->get('install.imported')) {
+            return redirect()->route('install.import');
+        }
+
+        return $this->renderStep($request, 'admin');
+    }
+
+    public function saveAdmin(Request $request)
+    {
+        if (!$request->session()->get('install.imported')) {
+            return redirect()->route('install.import');
+        }
+
+        $data = $request->validate([
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:190'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $database = $request->session()->get('install.database');
+
+        try {
+            $pdo = $this->connectToDatabase($database);
+
+            if ($this->adminEmailExists($pdo, $data['email'])) {
+                return back()->withInput()->withErrors(['email' => 'An admin with this email already exists.']);
+            }
+
+            $this->createAdmin($pdo, $data);
+            $this->writeEnvironment([
                 'APP_INSTALLED' => 'true',
-                'APP_KEY' => env('APP_KEY') ?: $this->generateAppKey(),
-                'APP_URL' => $request->root(),
-                'LICENSE_KEY' => $license['key'],
-                'LICENSE_EMAIL' => $license['email'],
-                'LICENSE_DOMAIN' => $license['domain'],
-                'LICENSE_STATUS' => $license['status'],
-                'LICENSE_VERIFIED_AT' => $license['verified_at'],
-            ]));
+            ]);
             $this->createInstallLock();
             Artisan::call('config:clear');
         } catch (Throwable $exception) {
-            return back()->withErrors(['import' => 'Import failed: ' . $exception->getMessage()]);
+            return back()->withInput()->withErrors(['email' => 'Admin creation failed: ' . $exception->getMessage()]);
         }
 
         $request->session()->forget('install');
@@ -326,6 +362,65 @@ class InstallController extends Controller
             'DB_USERNAME' => $database['db_username'],
             'DB_PASSWORD' => $database['db_password'] ?? '',
         ];
+    }
+
+    private function updateEnvironmentForPendingInstall(Request $request, array $database, array $license): void
+    {
+        $this->writeEnvironment(array_merge($this->databaseEnvironment($database), [
+            'APP_INSTALLED' => 'false',
+            'APP_KEY' => env('APP_KEY') ?: $this->generateAppKey(),
+            'APP_URL' => $request->root(),
+            'LICENSE_KEY' => $license['key'],
+            'LICENSE_EMAIL' => $license['email'],
+            'LICENSE_DOMAIN' => $license['domain'],
+            'LICENSE_STATUS' => $license['status'],
+            'LICENSE_VERIFIED_AT' => $license['verified_at'],
+        ]));
+
+        Artisan::call('config:clear');
+    }
+
+    private function adminEmailExists(PDO $pdo, string $email): bool
+    {
+        $statement = $pdo->prepare('SELECT COUNT(*) FROM admins WHERE email = ?');
+        $statement->execute([$email]);
+
+        return (int) $statement->fetchColumn() > 0;
+    }
+
+    private function createAdmin(PDO $pdo, array $data): void
+    {
+        $columns = $this->tableColumns($pdo, 'admins');
+        $admin = [
+            'firstName' => $data['first_name'],
+            'lastName' => $data['last_name'],
+            'email' => $data['email'],
+            'email_verified_at' => now()->toDateTimeString(),
+            'password' => Hash::make($data['password']),
+            'phone' => $data['phone'] ?? null,
+            'dashboard_style' => 'light',
+            'acnt_type_active' => 'active',
+            'status' => 'active',
+            'type' => 'Super Admin',
+            'created_at' => now()->toDateTimeString(),
+            'updated_at' => now()->toDateTimeString(),
+        ];
+
+        $admin = array_intersect_key($admin, array_flip($columns));
+        $fields = array_keys($admin);
+        $placeholders = implode(', ', array_fill(0, count($fields), '?'));
+        $sql = 'INSERT INTO admins (`' . implode('`, `', $fields) . '`) VALUES (' . $placeholders . ')';
+        $statement = $pdo->prepare($sql);
+        $statement->execute(array_values($admin));
+    }
+
+    private function tableColumns(PDO $pdo, string $table): array
+    {
+        $statement = $pdo->query('SHOW COLUMNS FROM `' . $table . '`');
+
+        return array_map(function ($column) {
+            return $column['Field'];
+        }, $statement->fetchAll());
     }
 
     private function databaseFilePath(): ?string

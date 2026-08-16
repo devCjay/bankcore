@@ -26,6 +26,7 @@
                 @endif
                 <div class="mb-5 row">
                     <div class="p-3 col-12">
+                        @include('admin.Settings.FrontendSettings.cms-guide')
                         @include('admin.Settings.FrontendSettings.faqs')
                         @include('admin.Settings.FrontendSettings.testimony')
                         @include('admin.Settings.FrontendSettings.images')
