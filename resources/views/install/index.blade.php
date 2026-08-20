@@ -183,7 +183,7 @@
                 @elseif ($step === 'license')
                     <div class="card">
                         <h2>License verification</h2>
-                        <p>Enter the purchase license. If <strong>INSTALL_LICENSE_ENDPOINT</strong> is set in .env, the installer will verify the key remotely against this domain.</p>
+                        <p>Enter the purchase license. The installer verifies the key through the configured license portal and binds it to this domain.</p>
                         <form class="form" method="post" action="{{ route('install.license.verify') }}">
                             @csrf
                             <label>License key

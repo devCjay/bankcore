@@ -11,6 +11,8 @@ use Throwable;
 
 class LicenseController extends Controller
 {
+    private const DEFAULT_LICENSE_ENDPOINT = 'https://license.bankingcore.net';
+
     public function index(Request $request)
     {
         return view('admin.license.index', [
@@ -65,7 +67,7 @@ class LicenseController extends Controller
             $licenseKey,
             env('LICENSE_EMAIL'),
             $request->getHost(),
-            env('INSTALL_LICENSE_ENDPOINT')
+            env('INSTALL_LICENSE_ENDPOINT') ?: self::DEFAULT_LICENSE_ENDPOINT
         );
 
         $this->writeEnvironment([
@@ -88,13 +90,15 @@ class LicenseController extends Controller
             'domain' => env('LICENSE_DOMAIN') ?: $request->getHost(),
             'status' => env('LICENSE_STATUS') ?: 'not-verified',
             'verified_at' => env('LICENSE_VERIFIED_AT'),
-            'endpoint' => env('INSTALL_LICENSE_ENDPOINT'),
+            'endpoint' => env('INSTALL_LICENSE_ENDPOINT') ?: self::DEFAULT_LICENSE_ENDPOINT,
             'current_domain' => $request->getHost(),
         ];
     }
 
     private function verifyLicense(string $licenseKey, ?string $email, string $domain, ?string $endpoint): array
     {
+        $endpoint = $this->licenseVerificationEndpoint($endpoint);
+
         if (!$endpoint) {
             return [
                 'valid' => true,
@@ -108,17 +112,18 @@ class LicenseController extends Controller
                 'license_key' => $licenseKey,
                 'email' => $email,
                 'domain' => $domain,
+                'product' => 'BankCore',
             ]);
 
-            if (!$response->ok()) {
+            $payload = $response->json() ?: [];
+
+            if (!$response->ok() && !isset($payload['valid'])) {
                 return [
                     'valid' => false,
                     'status' => 'failed',
                     'message' => 'License server returned HTTP ' . $response->status() . '.',
                 ];
             }
-
-            $payload = $response->json();
 
             if (isset($payload['valid']) && $payload['valid']) {
                 return [
@@ -153,6 +158,23 @@ class LicenseController extends Controller
         }
 
         return substr($licenseKey, 0, 4) . str_repeat('*', max(strlen($licenseKey) - 8, 4)) . substr($licenseKey, -4);
+    }
+
+    private function licenseVerificationEndpoint(?string $endpoint): ?string
+    {
+        $endpoint = $endpoint ?: self::DEFAULT_LICENSE_ENDPOINT;
+
+        if (!$endpoint) {
+            return null;
+        }
+
+        $endpoint = rtrim($endpoint, '/');
+
+        if (Str::endsWith($endpoint, '/api/verify-license')) {
+            return $endpoint;
+        }
+
+        return $endpoint . '/api/verify-license';
     }
 
     private function writeEnvironment(array $values): void

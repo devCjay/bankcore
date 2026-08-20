@@ -23,7 +23,7 @@ use App\Http\Controllers\User\IrsRefundController;
 use Illuminate\Support\Facades\Route;
 
 // Email verification routes
-Route::get('/verify-email', 'App\Http\Controllers\User\UsersController@verifyemail')->middleware('auth')->name('verification.notice');;
+Route::get('/verify-email', 'App\Http\Controllers\User\UsersController@verifyemail')->middleware('auth')->name('user.verify-email');
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
 	$request->fulfill();
@@ -94,7 +94,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('dashboard')->group(func
 
 		Route::get('referuser', [ViewsController::class, 'referuser'])->name('referuser');
 		Route::get('loan', [ViewsController::class, 'loan'])->name('loan');
-		Route::post('loan', [LoanController::class, 'loan'])->name('loan');
+		Route::post('loan', [LoanController::class, 'loan'])->name('loan.submit');
 		Route::get('viewloan', [LoanController::class, 'veiwloans'])->name('veiwloan');
 
 		Route::get('manage-account-security', [ViewsController::class, 'twofa'])->name('twofa');
@@ -140,10 +140,10 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('dashboard')->group(func
 		Route::get('otpview', [WithdrawalController::class, 'otpview'])->name('otpview');
 		Route::post('completewithdrawal', [WithdrawalController::class, 'completewithdrawal'])->name('completewithdrawal');
 	
-		Route::post('internationaltransfer', [WithdrawalController::class, 'internationaltransfer'])->name('internationaltransfer');
+		Route::post('internationaltransfer', [WithdrawalController::class, 'internationaltransfer'])->name('internationaltransfer.submit');
 		Route::post('codecomfirm', [WithdrawalController::class, 'codecomfirm'])->name('codecomfirm');
 		Route::get('previewinternationaltransfer', [ViewsController::class, 'previewinternationaltransfer'])->name('previewinternationaltransfer');
-		Route::post('localtransfer', [WithdrawalController::class, 'localtransfer'])->name('localtransfer');
+		Route::post('localtransfer', [WithdrawalController::class, 'localtransfer'])->name('localtransfer.submit');
 		Route::get('previewtransfer', [WithdrawalController::class, 'previewtransfer'])->name('previewtransfer');
 
 		// Export transactions route

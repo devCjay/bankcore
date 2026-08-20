@@ -97,8 +97,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Remote license endpoint</label>
-                                        <input type="url" class="form-control" name="license_endpoint" value="{{ old('license_endpoint', $license['endpoint']) }}" placeholder="https://license-server.com/api/verify">
-                                        <small class="form-text text-muted">If this is empty, the manager stores the license locally. Add an endpoint to require server-side validation.</small>
+                                        <input type="url" class="form-control" name="license_endpoint" value="{{ old('license_endpoint', $license['endpoint']) }}" placeholder="https://license.bankingcore.net">
+                                        <small class="form-text text-muted">Use the portal base URL. The manager will call /api/verify-license automatically.</small>
                                     </div>
                                     <button class="btn btn-primary" type="submit">
                                         <i class="ri-shield-check-line mr-1"></i> Save and Verify

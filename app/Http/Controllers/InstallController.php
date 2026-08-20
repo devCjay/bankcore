@@ -14,6 +14,7 @@ use Throwable;
 class InstallController extends Controller
 {
     private const MINIMUM_PHP_VERSION = '7.3.0';
+    private const DEFAULT_LICENSE_ENDPOINT = 'https://license.bankingcore.net';
 
     private $requiredExtensions = [
         'bcmath',
@@ -261,7 +262,7 @@ class InstallController extends Controller
 
     private function validateLicense(string $licenseKey, ?string $email, string $domain): array
     {
-        $endpoint = env('INSTALL_LICENSE_ENDPOINT');
+        $endpoint = $this->licenseVerificationEndpoint(env('INSTALL_LICENSE_ENDPOINT'));
 
         if (!$endpoint) {
             return [
@@ -276,22 +277,40 @@ class InstallController extends Controller
                 'license_key' => $licenseKey,
                 'email' => $email,
                 'domain' => $domain,
+                'product' => 'BankCore',
             ]);
 
-            if (!$response->ok()) {
-                return ['valid' => false, 'status' => 'failed', 'message' => 'License server rejected the request.'];
-            }
-
-            $payload = $response->json();
+            $payload = $response->json() ?: [];
 
             if (isset($payload['valid']) && $payload['valid']) {
                 return ['valid' => true, 'status' => 'remote-verified', 'message' => $payload['message'] ?? 'License verified.'];
+            }
+
+            if (!$response->ok() && !isset($payload['valid'])) {
+                return ['valid' => false, 'status' => 'failed', 'message' => 'License server returned HTTP ' . $response->status() . '.'];
             }
 
             return ['valid' => false, 'status' => 'failed', 'message' => $payload['message'] ?? 'License key is invalid.'];
         } catch (Throwable $exception) {
             return ['valid' => false, 'status' => 'failed', 'message' => 'License verification failed: ' . $exception->getMessage()];
         }
+    }
+
+    private function licenseVerificationEndpoint(?string $endpoint): ?string
+    {
+        $endpoint = $endpoint ?: self::DEFAULT_LICENSE_ENDPOINT;
+
+        if (!$endpoint) {
+            return null;
+        }
+
+        $endpoint = rtrim($endpoint, '/');
+
+        if (Str::endsWith($endpoint, '/api/verify-license')) {
+            return $endpoint;
+        }
+
+        return $endpoint . '/api/verify-license';
     }
 
     private function connectToDatabase(array $database): PDO
