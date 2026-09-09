@@ -210,6 +210,7 @@ public function app(){
             'mplans' => Plans::where('type','Main')->get(),
             'title' => 'Privacy Policy',
             'settings' => Settings::where('id', '=', '1')->first(),
+            'terms' => $terms,
         ));
     }
 

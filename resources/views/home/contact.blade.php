@@ -5,166 +5,99 @@
     }
 @endphp
 @extends('layouts.base')
-@inject('content', 'App\Http\Controllers\FrontController')
-@section('title', 'About Us')
-
+@section('title', 'Contact Us')
 
 @section('content')
-<div class="content-wrapper">
+@include('home.partials.modern-styles')
 
-<div class="breadcrumb-wrap bg-f br-1" style="margin-top:-140px;">
-<div class="container">
-<div class="breadcrumb-title">
-	<br><br>
-<h2>Contact Us</h2>
-<ul class="breadcrumb-menu list-style">
-<li><a href="/">Home </a></li>
-<li>Contact Us</li>
-</ul>
-</div>
-</div>
-</div>
+<main class="bank-front">
+    <section class="bank-hero">
+        <div class="bank-container">
+            <div class="bank-hero-grid">
+                <div data-bank-reveal>
+                    <div class="bank-eyebrow"><span class="bank-pulse"></span> {{ $settings->site_name }} Support</div>
+                    <h1>Support for your banking questions.</h1>
+                    <p class="bank-lead">Reach the team for account, transfer, card, loan, verification, or product support.</p>
+                    <div class="bank-hero-actions">
+                        <a href="{{ url('login') }}" class="bank-btn">Open online banking <i class="ri-arrow-right-line"></i></a>
+                        <a href="{{ url('register') }}" class="bank-btn secondary">Create account</a>
+                    </div>
+                </div>
+                <div class="bank-visual-card" data-bank-reveal>
+                    <img src="{{ asset('temp/custom/images/support.gif') }}" alt="Customer support">
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <section class="bank-section">
+        <div class="bank-container">
+            <div class="bank-grid">
+                <article class="bank-card" data-bank-reveal>
+                    <span class="bank-icon"><i class="ri-map-pin-line"></i></span>
+                    <h3>Our location</h3>
+                    <p>{{ $settings->address }}</p>
+                </article>
+                <article class="bank-card" data-bank-reveal>
+                    <span class="bank-icon"><i class="ri-mail-send-line"></i></span>
+                    <h3>Email us</h3>
+                    <p>{{ $settings->contact_email }}<br>{{ $settings->emailfrom }}</p>
+                </article>
+                <article class="bank-card" data-bank-reveal>
+                    <span class="bank-icon"><i class="ri-phone-line"></i></span>
+                    <h3>Phone support</h3>
+                    <p>VIP ONLY<br>VVIP DIAL</p>
+                </article>
+            </div>
+        </div>
+    </section>
 
-<section class="contact-us-wrap ptb-100">
-<div class="container">
-<div class="row justify-content-center">
-<div class="col-xl-4 col-lg-6 col-md-6">
-<div class="contact-item">
-<span class="contact-icon">
-<i class="ri-map-pin-line"></i>
-</span>
-<div class="contact-info">
-<h3>Our Location</h3>
-<p>{{ $settings->address }}
-</p>
-</div>
-</div>
-</div>
-<div class="col-xl-4 col-lg-6 col-md-6">
-<div class="contact-item">
-<span class="contact-icon">
-<i class="ri-mail-send-line"></i>
-</span>
-<div class="contact-info">
-<h3>Email Us</h3>
-{{ $settings->contact_email }}
-<br>
-{{ $settings->emailfrom }}
-</div>
-</div>
-</div>
-<div class="col-xl-4 col-lg-6 col-md-6">
-<div class="contact-item">
-<span class="contact-icon">
-<i class="ri-phone-line"></i>
-</span>
-<div class="contact-info">
-<h3>Phone</h3>
-<a href="#">VIP ONLY</a>
-<a href="#">VVIP DIAL</a>
-</div>
-</div>
-</div>
-</div>
-<div class="row">
-<div class="col-lg-7">
-<div class="contact-form">
+    <section class="bank-section bank-band">
+        <div class="bank-container">
+            <div class="bank-split">
+                <div data-bank-reveal>
+                    <div class="bank-eyebrow"><span class="bank-pulse"></span> Message us</div>
+                    <h2>Send a secure support request.</h2>
+                    <p style="margin-top:18px;">Use the form for product questions, account help, or support follow-up.</p>
+                    <ul class="bank-check-list">
+                        <li><i class="ri-check-line"></i><span>Account and profile support.</span></li>
+                        <li><i class="ri-check-line"></i><span>Transfer, card, and loan assistance.</span></li>
+                        <li><i class="ri-check-line"></i><span>Verification and onboarding questions.</span></li>
+                    </ul>
+                </div>
+                <div class="bank-form-card" data-bank-reveal>
+                    @if(Session::has('success'))
+                        <div class="alert alert-success">{{ Session::get('success') }}</div>
+                    @endif
+                    @if(Session::has('message'))
+                        <div class="alert alert-danger">{{ Session::get('message') }}</div>
+                    @endif
 
-
-
-                
-
-<form method="POST" action="{{route('homesendcontact')}}" class="form-wrap" id="">
-<div class="row">
-<div class="col-md-6">
-	<div>
-		@if(Session::has('success'))
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="alert alert-group alert-success alert-icon alert-dismissible fade show" role="alert">
-					<div class="alert-group-prepend">
-						<span class="alert-group-icon text-">
-							<i class="far fa-thumbs-up"></i>
-						</span>
-					</div>
-					<div class="alert-content">
-						{{ Session::get('success') }}
-					</div>
-					<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-			</div>
-		</div>
-		@endif
-	</div>
-<div class="form-group">
-	<br>
-<input type="text" name="fullname" placeholder="Name*" class="form-control input-lg" id="name" required data-error="Please enter your name">
-<div class="help-block with-errors"></div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="form-group">
-	<br>
-<input type="email" name="email" id="email" class="form-control input-lg" required placeholder="Email*" data-error="Please enter your email">
-<div class="help-block with-errors"></div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="form-group">
-	<br>
-<input type="text" name="phone" placeholder="Phone*" class="form-control input-lg" id="phone_number" required data-error="Please enter your phone number">
-<div class="help-block with-errors"></div>
-</div>
-</div>
-<div class="col-md-6">
-	<input type="hidden" name="_token" value="{{ csrf_token() }}">
-</div>
-<div class="col-md-12">
-<div class="form-group v1">
-	<br>
-<textarea name="message" id="message" placeholder="Your Messages.." class="form-control input-lg" cols="20" rows="5" required data-error="Please enter your message"></textarea>
-<div class="help-block with-errors"></div>
-</div>
-</div>
-
-<div class="form-group">
-<div class="form-check checkbox">
-	<br>
-<input name="gridCheck" value="I agree to the terms and privacy policy." class="form-check-input" type="checkbox" id="gridCheck" required>
-<label class="form-check-label" for="gridCheck">
-
-I agree to the <a class="link style1" href="terms">Terms &amp; Conditions</a> and <a class="link style1" href="privacy">Privacy Policy</a>
-</label>
-<div class="help-block with-errors gridCheck-error"></div>
-</div>
-</div>
-<div class="col-md-12">
-<button type="submit" name="submitbtn" class="btn style1">SEND MESSAGE<i class="ri-arrow-right-s-line"></i></button>
-<div id="msgSubmit" class="h3 text-center hidden"></div>
-<div class="clearfix"></div>
-</div>
-</div>
-</form>
-
-
-
-
-
-
-</div>
-</div>
-<div class="col-lg-5">
-<div class="comp-map">
-<img  src="temp/custom/images/support.gif" width="100%">
-</div>
-</div>
-</div>
-</div>
-</section>
-
-</div>
+                    <form method="POST" action="{{ route('homesendcontact') }}">
+                        @csrf
+                        <div class="form-group">
+                            <input type="text" name="fullname" placeholder="Name*" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="email" class="form-control" required placeholder="Email*">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="phone" placeholder="Phone*" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea name="message" placeholder="Your message*" class="form-control" rows="5" required></textarea>
+                        </div>
+                        <div class="form-group form-check">
+                            <input name="gridCheck" value="I agree to the terms and privacy policy." class="form-check-input" type="checkbox" id="gridCheck" required>
+                            <label class="form-check-label" for="gridCheck">
+                                I agree to the <a class="bank-card-link" href="{{ url('terms') }}">Terms &amp; Conditions</a> and <a class="bank-card-link" href="{{ url('privacy') }}">Privacy Policy</a>
+                            </label>
+                        </div>
+                        <button type="submit" class="bank-btn">Send message <i class="ri-arrow-right-line"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 @endsection
-

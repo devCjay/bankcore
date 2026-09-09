@@ -4,66 +4,34 @@
         exit();
     }
 @endphp
-
 @extends('layouts.base')
-@section('title', 'Terms and Privacy And Policy')
-@section('styles')
-@parent
-@endsection
-@inject('content', 'App\Http\Controllers\FrontController')
+@section('title', 'Privacy Policy')
+
 @section('content')
-<!-- Hero Start -->
-    <section class="bg-half bg-light d-table w-100">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="text-center col-lg-12">
-                    <div class="page-next-level">
-                        <h4 class="title"> Terms and Privacy Policy </h4>
-                        <div class="page-next">
-                            <nav aria-label="breadcrumb" class="d-inline-block">
-                                <ul class="mb-0 bg-white rounded shadow breadcrumb">
-                                    <li class="breadcrumb-item"><a href="/">{{ $settings->site_name }}</a></li>
+@include('home.partials.modern-styles')
 
-                                    <li class="breadcrumb-item active" aria-current="page">Privacy and policy</li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-                <!--end col-->
+<main class="bank-front">
+    <section class="bank-hero">
+        <div class="bank-container">
+            <div data-bank-reveal>
+                <div class="bank-eyebrow"><span class="bank-pulse"></span> {{ $settings->site_name }} Privacy</div>
+                <h1>Privacy policy.</h1>
+                <p class="bank-lead">Review how {{ $settings->site_name }} explains personal information, banking data, and website use.</p>
             </div>
-            <!--end row-->
         </div>
-        <!--end container-->
     </section>
-    <!--end section-->
-    <!-- Hero End -->
 
-    <!-- Start Privacy -->
-    <section class="section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-9">
-                    <div class="border-0 rounded shadow card">
-                        <div class="card-body">
-                            {!!$terms->description!!}
-                        </div>
-                    </div>
-                </div>
-                <!--end col-->
-            </div>
-            <!--end row-->
+    <section class="bank-section">
+        <div class="bank-container">
+            <article class="bank-legal" data-bank-reveal>
+                @if(isset($terms) && $terms)
+                    {!! $terms->description !!}
+                @else
+                    <h3>Privacy information</h3>
+                    <p>Privacy policy content is not currently configured.</p>
+                @endif
+            </article>
         </div>
-        <!--end container-->
     </section>
-    <!--end section-->
-    <!-- End Privacy -->
-
-
-    
-@endsection
-
-@section('scripts')
-@parent
-
+</main>
 @endsection

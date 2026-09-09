@@ -52,7 +52,7 @@ class meta
 
 	public function __construct(){ 
 		$this->product_id = '45470241';
-		$this->api_url = 'https://licensing.brynamics.com/';
+		$this->api_url = $this->configured_license_endpoint();
 		$this->api_key = '63A98FEFC9067E2D7992';
 		$this->api_language = 'english';
 		$this->current_version = 'v1.0.0';
@@ -169,22 +169,21 @@ class meta
 	}
 
 	public function activate_license($license, $client, $create_lic = true){
-		return array('status'=>true, 'message' => 'Valid //prowebber');
 		$data_array =  array(
-			"product_id"  => $this->product_id,
-			"license_code" => $license,
-			"client_name" => $client,
-			"verify_type" => $this->verify_type
+			"license_key" => $license,
+			"email" => filter_var($client, FILTER_VALIDATE_EMAIL) ? $client : null,
+			"domain" => $this->current_domain(),
+			"product" => "BankCore"
 		);
 		$get_data = $this->call_api(
 			'POST',
-			$this->api_url.'api/activate_license', 
+			$this->license_verification_url(), 
 			json_encode($data_array)
 		);
 		$response = json_decode($get_data, true);
 		if(!empty($create_lic)){
-			if($response['status']){
-				$licfile = trim($response['lic_response']);
+			if(!empty($response['valid'])){
+				$licfile = json_encode($data_array);
 				file_put_contents($this->license_file, $licfile, LOCK_EX);
 			}else{
 				@chmod($this->license_file, 0777);
@@ -193,26 +192,21 @@ class meta
 				}
 			}
 		}
-		return $response;
+		return $this->portal_response($response);
 	}
 
 	public function verify_license($time_based_check = false, $license = false, $client = false){
-		return array('status'=>true, 'message' => 'Valid //prowebber');
 		if(!empty($license)&&!empty($client)){
 			$data_array =  array(
-				"product_id"  => $this->product_id,
-				"license_file" => null,
-				"license_code" => $license,
-				"client_name" => $client
+				"license_key" => $license,
+				"email" => filter_var($client, FILTER_VALIDATE_EMAIL) ? $client : null,
+				"domain" => $this->current_domain(),
+				"product" => "BankCore"
 			);
 		}else{
 			if(is_file($this->license_file)){
-				$data_array =  array(
-					"product_id"  => $this->product_id,
-					"license_file" => file_get_contents($this->license_file),
-					"license_code" => null,
-					"client_name" => null
-				);
+				$data_array = json_decode(file_get_contents($this->license_file), true) ?: array();
+				$data_array["domain"] = $this->current_domain();
 			}else{
 				$data_array =  array();
 			}
@@ -246,10 +240,10 @@ class meta
 			if(strtotime($today) >= strtotime($_SESSION["b0698852a37d5fe"])){
 				$get_data = $this->call_api(
 					'POST',
-					$this->api_url.'api/verify_license', 
+					$this->license_verification_url(), 
 					json_encode($data_array)
 				);
-				$res = json_decode($get_data, true);
+				$res = $this->portal_response(json_decode($get_data, true));
 				if($res['status']==true){
 					$tomo = date('d-m-Y', strtotime($today. ' + '.$type_text));
 					$_SESSION["b0698852a37d5fe"] = $tomo;
@@ -259,10 +253,10 @@ class meta
 		}else{
 			$get_data = $this->call_api(
 				'POST',
-				$this->api_url.'api/verify_license', 
+				$this->license_verification_url(), 
 				json_encode($data_array)
 			);
-			$res = json_decode($get_data, true);
+			$res = $this->portal_response(json_decode($get_data, true));
 		}
 		return $res;
 	}
@@ -559,6 +553,48 @@ class meta
 			}
 			return $size; 
 		}
+	}
+
+	private function configured_license_endpoint(){
+		$endpoint = null;
+
+		if(function_exists('env')){
+			$endpoint = env('INSTALL_LICENSE_ENDPOINT');
+		}
+
+		$endpoint = $endpoint ?: getenv('INSTALL_LICENSE_ENDPOINT') ?: 'https://license.bankingcore.net';
+
+		return rtrim($endpoint, '/').'/';
+	}
+
+	private function license_verification_url(){
+		$endpoint = rtrim($this->api_url, '/');
+
+		if(substr($endpoint, -19) === '/api/verify-license'){
+			return $endpoint;
+		}
+
+		return $endpoint.'/api/verify-license';
+	}
+
+	private function current_domain(){
+		$host = getenv('HTTP_HOST')?:
+			(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null)?:
+			getenv('SERVER_NAME')?:
+			(isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '');
+
+		return strtolower(trim($host));
+	}
+
+	private function portal_response($response){
+		if(!is_array($response)){
+			return array('status' => false, 'message' => LB_TEXT_INVALID_RESPONSE);
+		}
+
+		return array(
+			'status' => !empty($response['valid']),
+			'message' => isset($response['message']) ? $response['message'] : (!empty($response['valid']) ? LB_TEXT_VERIFIED_RESPONSE : LB_TEXT_INVALID_RESPONSE)
+		);
 	}
  
 }

@@ -18,7 +18,7 @@ Route::get('terms', [HomePageController::class, 'terms'])->name('terms');
 Route::get('privacy', [HomePageController::class, 'privacy'])->name('privacy');
 Route::get('about', [HomePageController::class, 'about'])->name('about');
 Route::get('contact', [HomePageController::class, 'contact'])->name('contact');
-// Route::get('privacy', [HomePageController::class, 'faq'])->name('faq');
+Route::get('faq', [HomePageController::class, 'faq'])->name('faq');
 Route::get('business', [HomePageController::class, 'business'])->name('business');
 Route::get('apps', [HomePageController::class, 'app'])->name('app');
 Route::get('loans', [HomePageController::class, 'loans'])->name('loans');

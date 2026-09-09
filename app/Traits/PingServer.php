@@ -11,7 +11,8 @@ trait PingServer
 {
     public function callServer($action, $url, $data = [])
     {
-        $baseUrl = $_SERVER['HTTP_HOST'];
+        $baseUrl = $url ?: request()->getSchemeAndHttpHost();
+        $website = request()->getHost();
 
         $sett = SettingsCont::find(1);
 

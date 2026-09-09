@@ -258,7 +258,7 @@ Loans
   </a>
   </li>
   <li>
-  <a href="privacy-policy" target="_blank">
+  <a href="privacy" target="_blank">
   Privacy Policy
   </a>
   </li>
