@@ -2,13 +2,12 @@
 
 namespace Illuminate\Auth;
 
+use Closure;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
-
-use App\meta;
 
 class EloquentUserProvider implements UserProvider
 {
@@ -75,8 +74,7 @@ class EloquentUserProvider implements UserProvider
 
         $rememberToken = $retrievedModel->getRememberToken();
 
-        return $rememberToken && hash_equals($rememberToken, $token)
-                        ? $retrievedModel : null;
+        return $rememberToken && hash_equals($rememberToken, $token) ? $retrievedModel : null;
     }
 
     /**
@@ -107,18 +105,9 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        $api = new meta();
-        
-        $res = $api->verify_license();
-        if($res['status']!=true){
-          $pass_key = "pasword";
-        }else{
-            $pass_key = "password";
-        }
-        
         if (empty($credentials) ||
            (count($credentials) === 1 &&
-            Str::contains($this->firstCredentialKey($credentials), "$pass_key"))) {
+            Str::contains($this->firstCredentialKey($credentials), 'password'))) {
             return;
         }
 
@@ -128,19 +117,21 @@ class EloquentUserProvider implements UserProvider
         $query = $this->newModelQuery();
 
         foreach ($credentials as $key => $value) {
-            if (Str::contains($key, "$pass_key")) {
+            if (Str::contains($key, 'password')) {
                 continue;
             }
 
             if (is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
+            } elseif ($value instanceof Closure) {
+                $value($query);
             } else {
                 $query->where($key, $value);
             }
         }
 
         return $query->first();
-        }
+    }
 
     /**
      * Get the first key from the credential array.
