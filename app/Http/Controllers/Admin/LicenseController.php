@@ -11,7 +11,7 @@ use Throwable;
 
 class LicenseController extends Controller
 {
-    private const DEFAULT_LICENSE_ENDPOINT = 'https://license.bankingcore.net';
+    private const DEFAULT_LICENSE_ENDPOINT = 'https://license.bankingcore.net/api/verify_license';
 
     public function index(Request $request)
     {
@@ -90,7 +90,7 @@ class LicenseController extends Controller
             'domain' => env('LICENSE_DOMAIN') ?: $request->getHost(),
             'status' => env('LICENSE_STATUS') ?: 'not-verified',
             'verified_at' => env('LICENSE_VERIFIED_AT'),
-            'endpoint' => env('INSTALL_LICENSE_ENDPOINT') ?: self::DEFAULT_LICENSE_ENDPOINT,
+            'endpoint' => $this->licenseVerificationEndpoint(env('INSTALL_LICENSE_ENDPOINT')),
             'current_domain' => $request->getHost(),
         ];
     }
@@ -110,7 +110,9 @@ class LicenseController extends Controller
         try {
             $response = Http::timeout(15)->post($endpoint, [
                 'license_key' => $licenseKey,
+                'license_code' => $licenseKey,
                 'email' => $email,
+                'client_name' => $email ?: $domain,
                 'domain' => $domain,
                 'product' => 'BankCore',
             ]);
@@ -126,6 +128,14 @@ class LicenseController extends Controller
             }
 
             if (isset($payload['valid']) && $payload['valid']) {
+                return [
+                    'valid' => true,
+                    'status' => 'remote-verified',
+                    'message' => $payload['message'] ?? 'License verified successfully.',
+                ];
+            }
+
+            if (isset($payload['status']) && $payload['status']) {
                 return [
                     'valid' => true,
                     'status' => 'remote-verified',
@@ -170,11 +180,11 @@ class LicenseController extends Controller
 
         $endpoint = rtrim($endpoint, '/');
 
-        if (Str::endsWith($endpoint, '/api/verify-license')) {
+        if (Str::endsWith($endpoint, ['/api/verify_license', '/api/verify-license'])) {
             return $endpoint;
         }
 
-        return $endpoint . '/api/verify-license';
+        return $endpoint . '/api/verify_license';
     }
 
     private function writeEnvironment(array $values): void

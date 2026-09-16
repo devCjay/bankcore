@@ -14,7 +14,7 @@ use Throwable;
 class InstallController extends Controller
 {
     private const MINIMUM_PHP_VERSION = '7.3.0';
-    private const DEFAULT_LICENSE_ENDPOINT = 'https://license.bankingcore.net';
+    private const DEFAULT_LICENSE_ENDPOINT = 'https://license.bankingcore.net/api/verify_license';
 
     private $requiredExtensions = [
         'bcmath',
@@ -275,7 +275,9 @@ class InstallController extends Controller
         try {
             $response = Http::timeout(15)->post($endpoint, [
                 'license_key' => $licenseKey,
+                'license_code' => $licenseKey,
                 'email' => $email,
+                'client_name' => $email ?: $domain,
                 'domain' => $domain,
                 'product' => 'BankCore',
             ]);
@@ -283,6 +285,10 @@ class InstallController extends Controller
             $payload = $response->json() ?: [];
 
             if (isset($payload['valid']) && $payload['valid']) {
+                return ['valid' => true, 'status' => 'remote-verified', 'message' => $payload['message'] ?? 'License verified.'];
+            }
+
+            if (isset($payload['status']) && $payload['status']) {
                 return ['valid' => true, 'status' => 'remote-verified', 'message' => $payload['message'] ?? 'License verified.'];
             }
 
@@ -306,11 +312,11 @@ class InstallController extends Controller
 
         $endpoint = rtrim($endpoint, '/');
 
-        if (Str::endsWith($endpoint, '/api/verify-license')) {
+        if (Str::endsWith($endpoint, ['/api/verify_license', '/api/verify-license'])) {
             return $endpoint;
         }
 
-        return $endpoint . '/api/verify-license';
+        return $endpoint . '/api/verify_license';
     }
 
     private function connectToDatabase(array $database): PDO
