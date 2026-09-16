@@ -138,7 +138,7 @@
 
             <div class="content">
                 <div class="card hero">
-                    <h1>Install your banking platform.</h1>
+                    <h1>Install banking platform.</h1>
                     <p>Verify hosting requirements, validate the license, connect your MySQL database, and import the bundled database file from one clean setup flow.</p>
                 </div>
 
